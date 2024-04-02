@@ -7,7 +7,7 @@ on:
       - fix/update
 
 env:
-  REGISTRY_IMAGE: user/app
+  REGISTRY_IMAGE: $GITHUB_REPOSITORY
 
 jobs:
   build:
