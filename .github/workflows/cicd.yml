@@ -7,7 +7,7 @@ on:
       - fix/update
 
 env:
-  REGISTRY_IMAGE: $GITHUB_REPOSITORY
+  REGISTRY_IMAGE: ${{ github.repository }}
 
 jobs:
   build:
