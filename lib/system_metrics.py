@@ -55,12 +55,12 @@ open_file_descriptors_metric = Gauge('open_file_descriptors', 'Open File Descrip
 max_file_descriptors_metric = Gauge('max_file_descriptors', 'Max File Descriptors')
 index_docs_metric = Gauge('index_docs', 'Index components - Docs')
 sonarlint_client_metric = Gauge('sonarlint_client', 'SonarLint Connected Clients')
-total_of_user_metric = Gauge('total_of_user', 'Total of user')
-total_of_project_metric = Gauge('total_of_project', 'Total of project')
-total_line_of_code_metric = Gauge('total_line_of_code', 'Total line of code')
-total_of_plugins_metric = Gauge('total_of_plugins', 'Total of plugins')
-project_count_by_language_metric = Gauge('project_count_by_language', 'Project count by language', ['language'])
-ncloc_count_by_language_metric = Gauge('ncloc_count_by_language', 'Line of code count by language', ['language'])
+#total_of_user_metric = Gauge('total_of_user', 'Total of user')
+#total_of_project_metric = Gauge('total_of_project', 'Total of project')
+#total_line_of_code_metric = Gauge('total_line_of_code', 'Total line of code')
+#total_of_plugins_metric = Gauge('total_of_plugins', 'Total of plugins')
+#project_count_by_language_metric = Gauge('project_count_by_language', 'Project count by language', ['language'])
+#ncloc_count_by_language_metric = Gauge('ncloc_count_by_language', 'Line of code count by language', ['language'])
 
 
 def system_metric(sonarqube_server, sonarqube_token):
@@ -143,8 +143,10 @@ def system_metric(sonarqube_server, sonarqube_token):
   compute_engine_tasks_progressing_time_metric.set(compute_engine_tasks_progressing_time)
 
   compute_engine_tasks_worker = get_json('Worker Count', compute_engine_tasks)
-  compute_engine_tasks_worker_metric.set(compute_engine_tasks_worker)  
+  compute_engine_tasks_worker_metric.set(compute_engine_tasks_worker)
 
+
+##  print('catch')
 # Compute Engine JVM State
   compute_engine_jvm_state = get_json('Compute Engine JVM State', data)
   compute_engine_jvm_state_max_memory = get_json('Worker Count', compute_engine_jvm_state)
@@ -158,6 +160,9 @@ def system_metric(sonarqube_server, sonarqube_token):
 
   compute_engine_jvm_heap_init = get_json('Heap Init (MB)', compute_engine_jvm_state)
   compute_engine_jvm_heap_init_metric.set(compute_engine_jvm_heap_init)
+
+
+##  print('catch')
 
   compute_engine_jvm_heap_max = get_json('Heap Max (MB)', compute_engine_jvm_state)
   compute_engine_jvm_heap_max_metric.set(compute_engine_jvm_heap_max)
@@ -174,6 +179,8 @@ def system_metric(sonarqube_server, sonarqube_token):
   compute_engine_jvm_non_heap_used = get_json('Non Heap Used (MB)', compute_engine_jvm_state)
   compute_engine_jvm_non_heap_used_metric.set(compute_engine_jvm_non_heap_used)
 
+
+##  print('catch')
   compute_engine_jvm_threads = get_json('Threads', compute_engine_jvm_state)
   compute_engine_jvm_threads_metric.set(compute_engine_jvm_threads)
 
@@ -229,34 +236,52 @@ def system_metric(sonarqube_server, sonarqube_token):
   max_file_descriptors = get_json('Max File Descriptors', search_state)
   max_file_descriptors_metric.set(max_file_descriptors)
 
+
 # Search Indexes
   search_indexes = get_json('Search Indexes', data)
   index_docs = get_json('Index components - Docs', search_indexes)
   index_docs_metric.set(index_docs)
 
 # Server Push Connections
-  server_push_connections = get_json('Server Push Connections', data)
-  sonarlint_client = get_json('SonarLint Connected Clients', server_push_connections)
-  sonarlint_client_metric.set(sonarlint_client)
+##  server_push_connections = get_json('Server Push Connections', data)
+
+
+##  sonarlint_client = get_json('SonarLint Connected Clients', server_push_connections)
+
+##  print('client metrics')
+##  sonarlint_client_metric.set(sonarlint_client)
 
 # Statistics
-  statistics = get_json('Statistics', data)
-  total_of_user = get_json('userCount', statistics)
-  total_of_user_metric.set(total_of_user)
+##  print('catch')
+##  statistics = get_json('Statistics', data)
+##  print('user')
+##  total_of_user = get_json('userCount', statistics)
+##  print('u_metrics')
+##  total_of_user_metric.set(total_of_user)
+##  print('catch')
+##  total_of_project = get_json('projectCount', statistics)
+##  total_of_project_metric.set(total_of_project)
+##  print('catch')
+##  print('line code')
+##  total_line_of_code = get_json('ncloc', statistics)
+##  print('line code metrics')
+##  total_line_of_code_metric.set(total_line_of_code)
+##  print('plugins')
+##  total_of_plugins = get_json('plugins', statistics)
+##  print('plugins metric')
+##  total_of_plugins_metric.set(len(total_of_plugins))
 
-  total_of_project = get_json('projectCount', statistics)
-  total_of_project_metric.set(total_of_project)
 
-  total_line_of_code = get_json('ncloc', statistics)
-  total_line_of_code_metric.set(total_line_of_code)
+##  print('catch')
+##  project_count_by_language = get_json('projectCountByLanguage', statistics)
 
-  total_of_plugins = get_json('plugins', statistics)
-  total_of_plugins_metric.set(len(total_of_plugins))
+##  print('catch')
 
-  project_count_by_language = get_json('projectCountByLanguage', statistics)
-  for c in project_count_by_language:
-    project_count_by_language_metric.labels(language=c['language']).set(c['count'])
+##  for c in project_count_by_language:
+##    print('catch-1')
+##    project_count_by_language_metric.labels(language=c['language']).set(c['count'])
 
-  ncloc_count_by_language = get_json('nclocByLanguage', statistics)
-  for c in ncloc_count_by_language:
-    ncloc_count_by_language_metric.labels(language=c['language']).set(c['ncloc'])
+##  ncloc_count_by_language = get_json('nclocByLanguage', statistics)
+##  for c in ncloc_count_by_language:
+##    print('catch-2')
+##    ncloc_count_by_language_metric.labels(language=c['language']).set(c['ncloc'])

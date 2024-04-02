@@ -6,18 +6,31 @@ from prometheus_client import Enum, Gauge, Info
 def get_stat(metrics):
     stats = []
 # Creating a list of metrics that are supported by prometheus.
+
     for metric in metrics:
         if metric['type'] in ['INT', 'FLOAT', 'PERCENT', 'MILLISEC', 'RATING', 'WORK_DUR']:
-            g = Gauge(metric['key'], metric['name'], ['project_key', 'domain'])
+            print('metric key ' + metric['key'])
+            print('metric name ' + metric['name'])
+            if 'sg_i' in metric['key']:
+                g = Gauge(metric['key'][5:], metric['name'], ['project_key', 'domain'])
+            elif 'CXX' in metric['key']:
+                g = Gauge(metric['key'][4:], metric['name'], ['project_key', 'domain'])
+            else:
+                g = Gauge(metric['key'], metric['name'], ['project_key', 'domain'])
+                print(g)
         elif metric['key'] == 'alert_status':
+            print('alert ' + metric['key'])
             g = Enum(metric['key'], metric['name'], ['project_key', 'domain'], states=['ERROR', 'OK'])
         else:
             print('metrics is not supported')
         stats.append({'stat':g, 'metric':metric})
+        #else:
+        #    print('metric not supported ' + metric['key'])
     return stats
     
 def get_value(measures):
 # Getting the value of the metric.
+    prin('VALUE')
     if 'value' in measures[0]:
         try:
             value = measures[0]['value']
@@ -31,6 +44,7 @@ def get_value(measures):
     return value
 
 def set_metrics(sonar_issue_key, sonar_issue_domain, sonar_issue_type, value, prom_metric, project_key):
+    print('GET METRIC')
 # This is a function that is setting the metrics in prometheus.
     if sonar_issue_type in ['INT', 'FLOAT', 'PERCENT', 'MILLISEC', 'RATING', 'WORK_DUR']:
         prom_metric.labels(
@@ -47,6 +61,8 @@ def set_metrics(sonar_issue_key, sonar_issue_domain, sonar_issue_type, value, pr
 
 def common_metrics(projects, sonar, stats):
 # Getting the metrics from sonarqube and setting the metrics in prometheus.
+    print('=========********=========')
+    print(projects)
     prom_metric = stats['stat']
     sonar_metric = stats['metric']
     for p in projects:
@@ -54,20 +70,29 @@ def common_metrics(projects, sonar, stats):
         sonar_issue_key = sonar_metric['key']
         sonar_issue_domain = sonar_metric['domain']
         sonar_issue_type = sonar_metric['type']
-        component = sonar.measures.get_component_with_specified_measures(component=project_key, fields="metrics", metricKeys=sonar_issue_key)
+        component = sonar.measures.get_component_with_specified_measures(component=project_key, fields="metrics",
+                                                                         metricKeys=sonar_issue_key)
         measures = component['component']['measures']
         if len(measures) > 0:
             value = get_value(measures)
             set_metrics(sonar_issue_key, sonar_issue_domain, sonar_issue_type, value, prom_metric, project_key)
         else:
             print('component doesnt have metric')
-
 stat_rule = Gauge('stat_rule', 'Frequency of rule', ['project_key', 'rule'])
+
 def rule_metrics(projects, sonar):
+    #print('=========********=========')
+    #print(projects)
 # Getting the rules from sonarqube and setting the metrics in prometheus.
     for p in projects:
         project_key = p['key']
-        issues1 = list(sonar.issues.search_issues(componentKeys=project_key))
+        issues = sonar.issues.search_issues(componentKeys=project_key)
+        issues1 = issues['issues']
+        #print('=========********=========')
+        #print('=========********=========')
+        #print('=========********=========')
+        #print('=========********=========')
+        #print(issues1)
         rules = []
         for i in issues1:
             rules.append(i['rule'])
@@ -83,8 +108,9 @@ def event_metrics(projects, sonar):
 # Getting the events from sonarqube and setting the metrics in prometheus.
     for p in projects:
         project_key = p['key']
-        project_analyses_and_events = list(sonar.project_analyses.search_project_analyses_and_events(project=project_key))
-        for event in project_analyses_and_events:
+        project_analyses_and_events = sonar.project_analyses.search_project_analyses_and_events(project=project_key)
+        for event in project_analyses_and_events['analyses']:
+
             event_id = get_json("key", event)
             date = get_json("date", event)
             project_version = get_json("projectVersion", event)     

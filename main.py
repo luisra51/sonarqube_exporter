@@ -1,6 +1,5 @@
 # Importing the necessary libraries and modules.
-import os
-import time
+import os, time
 
 import prometheus_client as prom
 from lib.analysis_metrics import (common_metrics, event_metrics, get_stat,
@@ -45,21 +44,24 @@ def exporter_start():
     sonar = SonarQubeClient(sonarqube_url=sonarqube_server, token=sonarqube_token)
 
     # Getting a list of projects from the SonarQube server.
-    projects = list(sonar.projects.search_projects())
+    projectz = sonar.projects.search_projects()
+    projects = projectz['components']
+
 
     # Getting a list of metrics from the SonarQube server.
-    metrics = list(sonar.metrics.search_metrics())
+    metrics = sonar.metrics.search_metrics()
 
-    list_stat = get_stat(metrics)
+    list_stat = get_stat(metrics['metrics'])
     def metrics_task():
         """
         A function that is used to collect metrics from SonarQube.
         """
         system_metric(sonarqube_server, sonarqube_token)
+
         for stats in list_stat:
-            common_metrics(projects, sonar, stats)
-        rule_metrics(projects, sonar)
-        event_metrics(projects, sonar)
+            #common_metrics(projects, sonar, stats)
+            rule_metrics(projects, sonar)
+            event_metrics(projects, sonar)
         
     # Starting the http server and scheduling the metrics_task to run every minute.
     try:
